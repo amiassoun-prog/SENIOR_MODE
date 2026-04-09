@@ -1,91 +1,94 @@
-<div align="right" dir="rtl">
+<div dir="rtl" align="right">
 
 # SENIOR_MODE
 
-> מטודולוגיית עבודה ל-Claude Code שהופכת אותו מכותב קוד מהיר לארכיטקט תוכנה סניור.
+> **מתודולוגיית עבודה ל-Claude Code שהופכת אותו מכותב קוד מהיר לארכיטקט תוכנה סניור.**
 >
-> **המהירות לא הייתה הבעיה. התהליך היה.**
+> המהירות מעולם לא הייתה הבעיה — התהליך הוא שהיה.
 
-[English version below](#english)
+[For English, scroll down ↓](#english)
 
 ---
 
 ## הסיפור
 
-הכל התחיל מפוסט ששותף איתי. הפוסט טען טענה פשוטה וחזקה: Claude Code לא סובל מחוסר ידע, הוא סובל מחוסר תהליך. הוא כותב קוד מהר יותר מרוב המפתחים, אבל אז מגיעות הבאגים — race condition, hard-coded string שהיה צריך להיות enum, transaction ש-rollback-ה audit record שהיה צריך להישמר, טסטים שבודקים `assert(true)` במקום את הערך הנכון.
+הכל התחיל בפוסט ששותף איתי. הטענה בו הייתה פשוטה וחזקה: Claude Code אינו סובל מחוסר ידע, אלא מחוסר תהליך. הוא כותב קוד מהר יותר מרוב המפתחים, אך מיד אחריו מגיעים הבאגים — race conditions, מחרוזות קשיחות שהיו צריכות להיות enum, טרנזקציות שעושות rollback לרשומת audit שהייתה צריכה להישמר, וטסטים שבודקים `assert(true)` במקום את הערך האמיתי.
 
-כל תיקון מהיר. כל תיקון גורר אינסידנט, רגרסיה, retro. המהירות נטו, אחרי חישוב הבאגים, לא באמת גבוהה.
+כל תיקון בודד מהיר. אבל כל תיקון גורר אינסידנט, רגרסיה ו-retro. המהירות נטו, אחרי חישוב הבאגים, אינה גבוהה באמת.
 
-הפתרון הוא לא לשפר את הפלט, אלא לשנות את אופן החשיבה. מפתח ג'וניור קורא את הטיקט ומתחיל להקליד. מפתח סניור קורא את הטיקט, קורא את הקוד סביבו, קורא את הטסטים, בודק את ה-git log, ואז מקליד. איטי יותר — אבל לא חוזר לתקן את מה ששבר.
+הפתרון אינו לשפר את הפלט אלא לשנות את אופן החשיבה. מפתח ג'וניור קורא את הטיקט ומתחיל להקליד. מפתח סניור קורא את הטיקט, קורא את הקוד סביבו, קורא את הטסטים, בודק את היסטוריית ה-git, ורק אז מקליד. איטי יותר — אך אינו חוזר לתקן את מה ששבר.
 
-הפוסט הפנה ל-[`vlad-ko/claude-wizard`](https://github.com/vlad-ko/claude-wizard), skill מצוין שמיישם את ההגיון הזה ב-8 שלבים. קראנו אותו במלואו, אהבנו, ובמקום לשכפל — בנינו משהו מותאם.
+הפוסט הפנה אל [`vlad-ko/claude-wizard`](https://github.com/vlad-ko/claude-wizard), skill מצוין שמיישם את ההיגיון הזה בשמונה שלבים. קראנו אותו במלואו, התרשמנו, ובמקום לשכפל בחרנו לבנות משהו מותאם.
 
-**SENIOR_MODE הוא מנצח, לא תזמורת.** הוא לא ממציא גלגל. הוא לוקח את הרעיונות הטובים ביותר מ-`claude-wizard`, משלב אותם עם ה-skills הקיימים של [`superpowers`](https://github.com/obra/superpowers) ו-[`claude-combine`](https://github.com/obra/claude-combine), ומוסיף שלושה דברים שהרגשנו שחסרים.
+**SENIOR_MODE הוא מנצח, לא תזמורת.** הוא אינו ממציא את הגלגל מחדש. הוא לוקח את הרעיונות הטובים ביותר מ-[`claude-wizard`](https://github.com/vlad-ko/claude-wizard), משלב אותם עם ה-skills הקיימים של [`superpowers`](https://github.com/obra/superpowers) ו-[`claude-combine`](https://github.com/obra/claude-combine), ומוסיף שלושה דברים שהרגשנו שחסרו.
 
 ---
 
-## מה שמצאנו ש-/wizard לא פותר
+## מה ש-/wizard לא פותר
 
-1. **Over-process.** אם כל משימה עוברת את כל השלבים, תיקון טייפו נהיה טקס של 30 דקות. חייב סיווג.
-2. **המודל לא יודע שהוא שוכח.** checklist ב-markdown הופך להמלצה בלבד כשאין אינדיקטור ויזואלי שמראה שבאמת מבצעים אותו.
-3. **כל סשן מתחיל מאפס.** "אתמול החלטנו שאנחנו לא mock-ים את ה-DB כי נכווינו" נשכח אם אין memory gate.
+1. **עודף תהליך (over-process).** אם כל משימה עוברת את כל השלבים, תיקון של טייפו הופך לטקס בן שלושים דקות. נדרש סיווג חכם של המשימה לפני ההפעלה.
+2. **המודל אינו יודע שהוא שוכח.** רשימת בדיקה ב-markdown הופכת להמלצה בלבד כשאין אינדיקטור חזותי שמוכיח שאכן מבצעים אותה.
+3. **כל סשן מתחיל מאפס.** "אתמול החלטנו לא להשתמש ב-mocks על ה-DB כי נכווינו" יישכח בסשן הבא, אלא אם קיים שער זיכרון מובנה.
 
 ## שלוש התוספות של SENIOR_MODE
 
-### 1. Triage ב-3 רמות
-לפני כל דבר, סיווג מהיר במילה אחת מהמשתמש:
+### 1. סיווג (Triage) בשלוש רמות
+לפני כל דבר אחר, Claude מציע סיווג והמשתמש מאשר במילה אחת:
 
 | רמה | מתי | מה רץ |
 |---|---|---|
-| **TRIVIAL** | טייפו, log, rename, פחות מ-20 שורות | בלי תהליך. ישר לעבודה. |
-| **STANDARD** | באג ב-1-3 קבצים, פיצ'ר ממוקד | Explore → Implement → Verify → Adversarial Review |
-| **HEAVY** | concurrency, כסף, auth, schema, production, refactor רוחב | כל 7 השלבים כולל TDD ו-Memory Gate |
+| **TRIVIAL** | תיקון טייפו, לוג, rename, פחות מעשרים שורות | בלי תהליך — ישר לעבודה |
+| **STANDARD** | באג בקובץ אחד עד שלושה, פיצ'ר ממוקד | Explore ← Implement ← Verify ← Adversarial Review |
+| **HEAVY** | מקביליות, כסף, הרשאות, schema, production, רפקטור רוחב | כל שבעת השלבים, כולל TDD ו-Memory Gate |
 
-**הכלל הזהב להכרעה:** "אם זה ישבר ב-production, מה יקרה?" — לקוח מקבל חשבונית כפולה? Heavy. פיצ'ר אחד לא עובד? Standard. כלום מורגש? Trivial.
+**הכלל הזהב להכרעה במקרי גבול:** שואלים *"מה יקרה אם זה ישבר ב-production?"*
+לקוח יקבל חשבונית כפולה? → HEAVY. פיצ'ר אחד לא יעבוד? → STANDARD. דבר שאינו מורגש? → TRIVIAL.
 
-### 2. אינדיקטור ויזואלי חובה
-כל תגובה של משימת קוד מתחילה ב-`## [SENIOR] Phase N`. אם אין header, המשתמש יודע שדילגו. ה-header הוא החלון היחיד של המשתמש אל מה שקורה בראש של Claude.
+### 2. אינדיקטור חזותי מחייב
+כל תגובה על משימת קוד חייבת להתחיל בכותרת `## [SENIOR] Phase N`. בלעדיה, המשתמש יודע מיד שהתהליך דולג. הכותרת היא החלון היחיד של המשתמש אל מה שמתרחש בראשו של Claude — ולכן היא אינה ניתנת לוויתור.
 
-### 3. Memory Gate פרואקטיבי
-בסוף כל משימת Heavy, Claude לא שואל "מה נזכור?" — הוא מציע רשומות זיכרון ספציפיות והמשתמש מסנן. זה ה"senior engineer doesn't start from zero every day".
+### 3. שער זיכרון (Memory Gate) פרואקטיבי
+בסיום כל משימת HEAVY, Claude אינו שואל "מה נזכור?". במקום זאת הוא מציע רשומות זיכרון קונקרטיות, והמשתמש רק מאשר או דוחה. זוהי השכבה של *"מפתח סניור אינו מתחיל כל יום מאפס"*.
 
 ---
 
-## איך זה משתלב עם ה-skills הקיימים
+## שילוב עם ה-skills הקיימים
 
-SENIOR_MODE לא מחליף את ה-skills שיש לך. הוא מנצח עליהם:
+SENIOR_MODE אינו מחליף את ה-skills שכבר יש לך — הוא מנצח עליהם:
 
 | שלב ב-SENIOR_MODE | ה-skill שמופעל |
 |---|---|
-| Phase 0 — רעיון עמום | `superpowers:brainstorming` |
-| Phase 1 — הבנה | `superpowers:writing-plans` |
-| Phase 2 — חקירת הקוד | `Grep`, `Read`, `Explore` agent |
-| Phase 3 — TDD | `claude-combine:test-driven-development` |
+| Phase 0 — רעיון עמום (לפני המימוש) | `superpowers:brainstorming` |
+| Phase 1 — הבנה ותכנון | `superpowers:writing-plans` |
+| Phase 2 — חקירת בסיס הקוד | `Grep`, `Read`, סוכן `Explore` |
+| Phase 3 — פיתוח מונחה-בדיקות (TDD) | `claude-combine:test-driven-development` |
 | Phase 4 — מימוש | `superpowers:executing-plans` |
-| Phase 5 — אימות | `claude-combine:verification-before-completion` |
-| Phase 6 — Adversarial Review | `claude-combine:requesting-code-review` |
-| אחרי PR | `claude-combine:finishing-a-development-branch` |
+| Phase 5 — אימות עם פלט אמיתי | `claude-combine:verification-before-completion` |
+| Phase 6 — ביקורת אדוורסרית | `claude-combine:requesting-code-review` |
+| אחרי פתיחת PR | `claude-combine:finishing-a-development-branch` |
 
 ---
 
 ## זרימה אמיתית
 
+תרשים הזרימה למטה מוצג באנגלית בכוונה, כדי לשמור על יישור תקין של תווי ציור הקופסה בתוך בלוק קוד RTL.
+
 ```
-ההודעה שלך
+Your message
    │
    ▼
-[UserPromptSubmit hook]  ← רץ אוטומטית על כל הודעה
+[UserPromptSubmit hook]  ← fires automatically on every message
    │
-   ├── שיחה / שאלה / מחקר? → תגובה רגילה, בלי header, דלג בשקט
-   ├── יש "fast" / "בלי סניור"? → דלג בשקט
-   ├── רעיון עמום? → הצע brainstorming קודם
-   └── משימת קוד קונקרטית?
+   ├── Conversation / question / research? → normal reply, no header, skip
+   ├── Contains "fast" / "בלי סניור"? → skip silently
+   ├── Fuzzy idea? → propose brainstorming first
+   └── Concrete code task?
                     │
                     ▼
            ## [SENIOR] Triage
-           סיווג מוצע: STANDARD
-           סיבה: קובץ בודד, באג ממוקד, בלי state משותף
-           אישור? (כן / heavy / trivial / דלג)
+           Proposed: STANDARD
+           Reason: single file, focused bug, no shared state
+           Approve? (yes / heavy / trivial / skip)
                     │
           ┌─────────┼─────────┐
           ▼         ▼         ▼
@@ -105,16 +108,16 @@ SENIOR_MODE לא מחליף את ה-skills שיש לך. הוא מנצח עליה
 
 ## התקנה
 
-### 1. ה-skill
-העתק את `skill/SKILL.md` לתיקיית ה-skills שלך:
+### 1. התקנת ה-skill
+יש להעתיק את `skill/SKILL.md` לתיקיית ה-skills הגלובלית של Claude Code:
 
 ```bash
 mkdir -p ~/.claude/skills/senior-mode
 cp skill/SKILL.md ~/.claude/skills/senior-mode/SKILL.md
 ```
 
-### 2. ה-hook
-העתק את ה-hook script:
+### 2. התקנת ה-hook
+יש להעתיק את סקריפט ה-hook ולהעניק לו הרשאות ריצה:
 
 ```bash
 mkdir -p ~/.claude/hooks
@@ -122,8 +125,8 @@ cp hooks/senior-mode-reminder.sh ~/.claude/hooks/senior-mode-reminder.sh
 chmod +x ~/.claude/hooks/senior-mode-reminder.sh
 ```
 
-### 3. רישום ה-hook ב-`~/.claude/settings.json`
-הוסף את הבלוק הבא ל-`settings.json` הגלובלי שלך (צור את הקובץ אם הוא לא קיים):
+### 3. רישום ה-hook בקובץ `~/.claude/settings.json`
+יש להוסיף את הבלוק הבא ל-`settings.json` הגלובלי (יש ליצור את הקובץ אם אינו קיים):
 
 ```json
 {
@@ -143,69 +146,69 @@ chmod +x ~/.claude/hooks/senior-mode-reminder.sh
 }
 ```
 
-אם כבר יש לך `hooks` ב-settings שלך, הוסף את הבלוק ל-`UserPromptSubmit` הקיים במקום להחליף את כל החלק.
+אם יש לך כבר מפתח `hooks` בקובץ, מזגו את הבלוק אל מערך ה-`UserPromptSubmit` הקיים במקום להחליף את כל האזור.
 
-**הערה למשתמשי Windows עם Git Bash:** החלף את הנתיב בקובץ settings בנתיב מוחלט כמו `bash C:/Users/<username>/.claude/hooks/senior-mode-reminder.sh`.
+**הערה למשתמשי Windows עם Git Bash:** יש להחליף את הנתיב בנתיב מוחלט, לדוגמה: `bash C:/Users/<username>/.claude/hooks/senior-mode-reminder.sh`.
 
-### 4. אתחול
-אין צורך ב-restart. ה-hook מתחיל לירות על ההודעה הבאה שתשלח ל-Claude Code.
+### 4. הפעלה
+לא נדרש restart. ה-hook יתחיל לפעול כבר בהודעה הבאה שתשלח ל-Claude Code.
 
 ---
 
 ## יציאות חירום
 
-לפעמים אתה רק רוצה לכתוב קוד בלי טקס. הוסף אחד מאלה להודעה שלך והמטודה תדלג בשקט:
+לעיתים פשוט רוצים לכתוב קוד בלי טקס. הוספה של אחת מהמילים הבאות להודעה תגרום למתודה לדלג בשקט:
 
 - `fast`
 - `בלי סניור`
 - `בלי senior`
 
-או תגיד `trivial` או `דלג` כשה-Triage מוצע.
+לחלופין, אפשר להשיב `trivial` או `דלג` בשלב הצעת ה-Triage.
 
 ---
 
 ## חולשות ידועות
 
-אני מעדיף לציין את החולשות מאשר להסתיר אותן:
+עדיף לציין את החולשות מאשר להסתיר אותן:
 
-- **Triage תלוי בשיקול דעת של LLM.** הוא יכול לסווג לא נכון. ה-compromise הוא "LLM מציע, משתמש מאשר במילה אחת". זה עובד, אבל אם המשתמש מאשר בעיניים עצומות, הסיווג חוזר להיות אוטומטי.
-- **ה-header הוא הבטחה, לא אכיפה.** שום דבר לא מונע מ-Claude לכתוב `## [SENIOR] Phase 2: Explore` בלי באמת להפעיל Grep. בפועל זה נראה שעצם חובת ה-header משפרת בצורה ניכרת, אבל זה לא מושלם.
-- **Memory Gate יכול להתיישן.** אם אתה שומר הרבה רשומות זיכרון, חלקן יהפכו ל-stale. צריך לחזור אליהן מדי פעם.
-- **עוד לא נבדק בתוך build pipelines או CI.** כרגע זה עובד ב-Claude Code interactive. הרחבה ל-CI היא עבודה עתידית.
+- **הסיווג (Triage) תלוי בשיקול-דעת של LLM.** הוא עלול לסווג בטעות. הפשרה היא *"המודל מציע, המשתמש מאשר במילה אחת"*. זה עובד טוב בפועל, אך אם המשתמש מאשר בעיניים עצומות, הסיווג חוזר להיות אוטומטי דה-פקטו.
+- **הכותרת היא הבטחה, לא אכיפה.** שום דבר אינו מונע מ-Claude לכתוב `## [SENIOR] Phase 2: Explore` מבלי להפעיל בפועל את `Grep`. בפועל ניכר שעצם חובת הכותרת משפרת משמעותית את ההתנהגות, אך זו אינה ערובה מוחלטת.
+- **שער הזיכרון עלול להתיישן.** כאשר נשמרות רשומות זיכרון רבות, חלקן יהפכו למיושנות עם הזמן. מומלץ לבצע חזרה ובחינה תקופתית של רשומות הזיכרון.
+- **טרם נבדק ב-CI או בצינורות build.** כרגע המתודה עובדת במצב אינטראקטיבי של Claude Code. הרחבה ל-CI נחשבת לעבודה עתידית.
 
 ---
 
 ## תודות וקרדיטים
 
-הפרויקט הזה לא היה קיים בלי העבודה של מספר אנשים ופרויקטים:
+הפרויקט הזה לא היה קם לתחייה ללא עבודתם של כמה אנשים ופרויקטים:
 
 ### [Vlad Ko](https://github.com/vlad-ko) — מחבר [`claude-wizard`](https://github.com/vlad-ko/claude-wizard)
-תודה ענקית ל-Vlad על ה-skill המקורי שהתחיל את כל הסיפור הזה. המבנה של 8 השלבים, שאלות ה-adversarial review, דגש על mutation testing mindset, והאנלוגיה של junior-mode מול senior-mode — כל אלה שלו. קראנו את ה-repo שלו במלואו לפני שנגענו בשורת קוד אחת, ו-SENIOR_MODE הוא במובן מסוים "claude-wizard מעובד לצרכים שלי". אם אתה מגיע לכאן מ-/wizard, קודם תסתכל על הריפו שלו — זה המקור.
+תודה ענקית ל-Vlad על ה-skill המקורי שהתחיל את כל הסיפור הזה. מבנה שמונת השלבים, שאלות הביקורת האדוורסרית, הדגש על *mutation testing mindset* והאנלוגיה של מוד ג'וניור מול מוד סניור — כל אלה שלו. קראנו את ה-repo שלו במלואו לפני שנגענו בשורת קוד אחת, ו-SENIOR_MODE הוא במובן מסוים **"claude-wizard מעובד לצרכים שלנו"**. אם הגעת לכאן דרך `/wizard`, כדאי קודם לעיין בריפו שלו — זה המקור שהכל נולד ממנו.
 
 ### [Jesse Obra](https://github.com/obra) — מחבר [`superpowers`](https://github.com/obra/superpowers) ו-[`claude-combine`](https://github.com/obra/claude-combine)
-המערכת של skills שבאמת נדלקים בזמן הנכון, ה-`brainstorming` skill שהופך רעיון עמום למפרט (שלא הייתי מוותר עליו בשום אופן), `writing-plans`, `executing-plans`, `test-driven-development`, `verification-before-completion` — כולם שם. SENIOR_MODE הוא פשוט conductor מעליהם. בלי התשתית הזו לא היה מה לנצח עליו.
+מערכת ה-skills שבאמת נדלקת בזמן הנכון, ה-skill של `brainstorming` שהופך רעיון עמום למפרט מוגדר (ולא הייתי מוותר עליו בשום פנים ואופן), `writing-plans`, `executing-plans`, `test-driven-development`, `verification-before-completion` — כל אלה כבר קיימים בזכותו. SENIOR_MODE הוא פשוט מנצח מעל התזמורת שלו. בלי התשתית הזאת לא היה על מה לנצח.
 
 ### צוות Anthropic
-על בניית Claude Code, מערכת ה-skills, ה-hooks, וה-memory system שמאפשרים לעבוד ככה מלכתחילה.
+על בניית Claude Code, מערכת ה-skills, מנגנון ה-hooks ומערכת הזיכרון — כל אלה מאפשרים לעבוד בצורה הזו מלכתחילה.
 
-### המחבר של הפוסט
-על השיחה שהתחילה את הכל. הפוסט לא שלי, אבל הוא הציף את הבעיה ואת הפתרון החלקי בצורה שגרמה לי לרצות לבנות את המשך הפתרון. תודה.
+### מחבר הפוסט שהתחיל הכל
+על השיחה שהניעה את הפרויקט. הפוסט אינו שלי, אך הוא הציף את הבעיה ואת הפתרון החלקי בצורה כה משכנעת, עד שרציתי לבנות את המשך הפתרון. תודה.
 
 ---
 
 ## רישיון
 
-MIT — השתמש, שנה, הפץ. אם זה עזר לך, ספר ל-vlad-ko שזה נולד מהעבודה שלו.
+MIT — לשימוש חופשי, לשינוי ולהפצה. אם זה עזר לך, כדאי לספר ל-Vlad Ko שהפרויקט הזה נולד מתוך העבודה שלו.
 
 ---
 
-## תרומה
+## תרומה לפרויקט
 
-PRs מבורכים. כיוונים שמעניינים אותי במיוחד:
-- אכיפה אמיתית של ה-header (hook שבודק שהתגובה מתחילה ב-`## [SENIOR]`)
-- אינטגרציה עם CI/CD pipelines
-- קריטריוני Triage מדויקים יותר לשפות ספציפיות
-- תרגומים ל-README לשפות נוספות
+בקשות משיכה (PRs) יתקבלו בברכה. הכיוונים שמעניינים אותי במיוחד:
+- אכיפה אמיתית של הכותרת החזותית — hook משלים שיבדוק שהתגובה אכן מתחילה ב-`## [SENIOR]`
+- אינטגרציה מלאה עם צינורות CI/CD
+- קריטריוני Triage מדויקים יותר לשפות תכנות ספציפיות (Python, Java, Rust וכדומה)
+- תרגומי README לשפות נוספות
 
 </div>
 
